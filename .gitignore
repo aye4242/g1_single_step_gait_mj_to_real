@@ -29,11 +29,13 @@ wandb/
 runs/
 checkpoints/
 outputs/
+unitree_rl_mjlab/logs/
 
 # 模型文件（训练产物，通常很大）
 *.pth
 *.onnx
 *.pt
+model_*.pt
 
 # Jupyter Notebook 缓存
 .ipynb_checkpoints/
@@ -57,3 +59,27 @@ MUJOCO_LOG.TXT
 # 大型数据文件
 *.pkl
 *.pickle
+
+# 预训练模型和动作数据
+**/deploy/robots/*/config/policy/mimic/
+
+# 训练视频
+*.mp4
+*.avi
+*.mov
+
+# 第三方依赖库（可重新下载）
+**/thirdparty/onnxruntime-*/
+**/simulate/mujoco/
+
+# 演示文件
+**/doc/gif/*.gif
+*.gif
+
+# 非 G1 机器人模型（本项目仅使用 G1）
+unitree_rl_mjlab/src/assets/robots/unitree_a2/
+unitree_rl_mjlab/src/assets/robots/unitree_as2/
+unitree_rl_mjlab/src/assets/robots/unitree_go2/
+unitree_rl_mjlab/src/assets/robots/unitree_h1_2/
+unitree_rl_mjlab/src/assets/robots/unitree_h2/
+unitree_rl_mjlab/src/assets/robots/unitree_r1/
