@@ -1,0 +1,59 @@
+# Python 缓存文件
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# 虚拟环境
+.venv/
+.venv-*/
+venv/
+ENV/
+env/
+*.egg-info/
+dist/
+build/
+
+# IDE 配置
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 训练日志和输出
+*.log
+logs/
+wandb/
+runs/
+checkpoints/
+outputs/
+
+# 模型文件（训练产物，通常很大）
+*.pth
+*.onnx
+*.pt
+
+# Jupyter Notebook 缓存
+.ipynb_checkpoints/
+
+# 系统文件
+Thumbs.db
+.DS_Store
+
+# 子仓库的 .git 目录（不需要嵌套 git）
+G1DWAQ_Lab/.git/
+unitree_rl_mjlab/.git/
+
+# 临时文件
+*.tmp
+*.bak
+*.orig
+
+# MuJoCo 日志
+MUJOCO_LOG.TXT
+
+# 大型数据文件
+*.pkl
+*.pickle
