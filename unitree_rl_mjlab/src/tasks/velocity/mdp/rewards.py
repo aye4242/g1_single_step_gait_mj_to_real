@@ -431,3 +431,48 @@ def stand_still(
             reward *= scale
     return reward
 
+
+def lateral_overshoot_penalty(
+  env: ManagerBasedRlEnv,
+  command_name: str,
+  margin: float = 0.15,
+  asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
+) -> torch.Tensor:
+  """Penalize lateral velocity overshoot beyond a tolerance margin.
+
+  Only the lateral (y) velocity error exceeding *margin* is punished, so the
+  policy can track commands softly but is hard-penalized for overshooting
+  (e.g. the repeated sidestep "hop-and-drift" on soft carpet that can drive
+  the robot into a wall).
+  """
+  asset: Entity = env.scene[asset_cfg.name]
+  command = env.command_manager.get_command(command_name)
+  assert command is not None
+  actual_y = asset.data.root_link_lin_vel_b[:, 1]
+  error = torch.abs(command[:, 1] - actual_y)
+  overshoot = torch.relu(error - margin)
+  return torch.square(overshoot)
+
+
+def body_clearance(
+  env: ManagerBasedRlEnv,
+  margin: float,
+  asset_cfg_a: SceneEntityCfg,
+  asset_cfg_b: SceneEntityCfg,
+) -> torch.Tensor:
+  """Reward minimum distance between two site sets (hinge at *margin*).
+
+  Returns 1.0 when the closest pair of sites is at least *margin* apart,
+  decaying linearly to 0.0 as the distance shrinks to zero. Used e.g. to keep
+  the Dex3 right hand clear of the right thigh during walking.
+  """
+  asset: Entity = env.scene[asset_cfg_a.name]
+  pos_a = asset.data.site_pos_w[:, asset_cfg_a.site_ids, :]  # [B, Na, 3]
+  pos_b = asset.data.site_pos_w[:, asset_cfg_b.site_ids, :]  # [B, Nb, 3]
+  diff = pos_a.unsqueeze(2) - pos_b.unsqueeze(1)  # [B, Na, Nb, 3]
+  dist = torch.norm(diff, dim=-1)  # [B, Na, Nb]
+  min_dist = torch.min(dist.reshape(dist.shape[0], -1), dim=1)[0]  # [B]
+  reward = torch.clamp(min_dist / margin, min=0.0, max=1.0)
+  env.extras["log"]["Metrics/body_clearance_min_dist"] = torch.mean(min_dist)
+  return reward
+
