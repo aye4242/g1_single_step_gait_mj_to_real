@@ -269,6 +269,12 @@ class SingleStepController:
             if self.remote_controller.button[KeyMap.select] == 1:
                 self.stop()
             time.sleep(self.config.control_dt)
+        # 重置相位和历史，对齐训练时 episode reset 的行为
+        self.gait_phase_time = 0.0
+        self.obs_history = np.zeros(
+            (self.config.history_length, self.config.num_obs), dtype=np.float32
+        )
+        self.first_run = True
         print("[INFO] ✅ A 按钮已按下，开始策略控制\n")
 
     def compute_gait_phase(self) -> np.ndarray:
@@ -326,8 +332,11 @@ class SingleStepController:
         self.current_obs[3:6] = gravity_orientation
         self.current_obs[6:9] = command
 
-        # 步态相位
+        # 步态相位：静止时归零（与训练一致）
+        cmd_speed = np.linalg.norm(command[:2])
         gait_phase = self.compute_gait_phase()
+        if cmd_speed < 0.1:
+            gait_phase = np.zeros(2, dtype=np.float32)
         self.current_obs[9:11] = gait_phase
         self.gait_phase_time += self.config.control_dt
 

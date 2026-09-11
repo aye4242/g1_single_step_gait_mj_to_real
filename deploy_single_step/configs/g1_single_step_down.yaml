@@ -1,0 +1,45 @@
+# Unitree G1 单台阶下楼任务配置
+# 基于 unitree_rl_mjlab 训练的盲走策略 (下台阶专用)
+
+control_dt: 0.02  # 50 Hz
+
+msg_type: "hg"
+imu_type: "pelvis"
+
+lowcmd_topic: "rt/lowcmd"
+lowstate_topic: "rt/lowstate"
+
+policy_path: "policy/policy_down.onnx"
+
+history_length: 5
+
+joint2motor_idx: [0, 6, 12, 1, 7, 13, 2, 8, 14, 3, 9, 15, 22, 4, 10, 16, 23, 5, 11, 17, 24, 18, 25, 19, 26, 20, 27, 21, 28]
+
+kps: [200, 200, 200, 150, 150, 200, 150, 150, 200, 200, 200, 100, 100, 20, 20, 100, 100, 20, 20, 50, 50, 50, 50, 40, 40, 40, 40, 40, 40]
+kds: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+
+default_joint_pos: [-0.2, -0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.42, 0.42, 0.35, 0.35, -0.23, -0.23, 0.18, -0.18, 0.0, 0.0, 0.0, 0.0, 0.87, 0.87, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+torso_idx: 22
+
+ang_vel_scale: 1.0
+dof_pos_scale: 1.0
+dof_vel_scale: 1.0
+action_scale: 0.25
+command_scale: [1.0, 1.0, 1.0]
+
+num_actions: 29
+num_obs: 98
+
+# 下台阶速度保守，不要太快
+command_range:
+  lin_vel_x: [0.2, 0.6]
+  lin_vel_y: [-0.1, 0.1]
+  ang_vel_z: [-0.2, 0.2]
+
+gait_phase_period: 0.6  # 与训练 velocity_env_cfg.py:74 period=0.6 保持一致
+
+max_joint_vel: 20.0
+max_torque: 100.0
+# 下台阶躯干自然前倾更大，放宽到 40 度防止误触发
+max_body_tilt: 40.0

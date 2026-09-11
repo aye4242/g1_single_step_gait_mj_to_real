@@ -166,19 +166,25 @@ def unitree_g1_single_step_down_env_cfg(play: bool = False) -> ManagerBasedRlEnv
 
   # Fixed command ranges for the whole run.
   cfg.curriculum.pop("command_vel", None)
+  if not play and "terrain_levels" in cfg.curriculum:
+    # 下台阶布局：spawn在x=2m，台阶在x=4m（tile中心）。默认 move_up=4m 需走到tile末端，
+    # 机器人实际速度不足，curriculum永远卡住。改为2.5m：越过台阶后再走0.5m即晋级。
+    cfg.curriculum["terrain_levels"].params["move_up_distance"] = 2.5
 
   # ------------------------------------------------------------------ #
   # Reward overrides for down-step task — 完全对齐 G1DWAQ_Lab 策略喵～  #
   # ------------------------------------------------------------------ #
 
-  # --- 删除对下台阶有害或 G1DWAQ 不使用的 reward 项 ---
+  # --- 删除对下台阶真正有害的 reward 项 ---
   del cfg.rewards["soft_landing"]      # 惩罚落地冲击 → 下台阶必然触发，有害
   del cfg.rewards["foot_clearance"]    # 惩罚抬腿不足 → 下台阶需向下踏而非向上抬
-  del cfg.rewards["foot_gait"]         # 固定步态奖励 → G1DWAQ 无此项
-  del cfg.rewards["foot_slip"]         # G1DWAQ 无此项
-  del cfg.rewards["stand_still"]       # G1DWAQ 无此项
-  del cfg.rewards["pose"]              # 姿势参考奖励 → G1DWAQ 无此项
-  del cfg.rewards["angular_momentum"]  # G1DWAQ 无此项
+
+  # --- 步态塑形 reward 保留但降权，防止步态崩坏 ---
+  cfg.rewards["foot_gait"].weight = 0.2         # 原0.5 → 0.2，保留基本交替步态
+  cfg.rewards["foot_slip"].weight = -0.1        # 原-0.25 → -0.1，适当放松
+  cfg.rewards["pose"].weight = 0.3              # 原1.0 → 0.3，保留手臂/姿态参考
+  cfg.rewards["stand_still"].weight = -0.3      # 原-1.0 → -0.3，适当放松
+  del cfg.rewards["angular_momentum"]           # 角动量惩罚对下台阶影响小，删除
 
   # --- 对齐 G1DWAQ 的 reward 权重 ---
   cfg.rewards["track_linear_velocity"].weight = 2.0   # 1.0 → 2.0

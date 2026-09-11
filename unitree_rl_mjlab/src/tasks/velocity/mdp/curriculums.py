@@ -32,6 +32,7 @@ def terrain_levels_vel(
   env_ids: torch.Tensor,
   command_name: str,
   asset_cfg: SceneEntityCfg = _DEFAULT_SCENE_CFG,
+  move_up_distance: float | None = None,
 ) -> torch.Tensor:
   asset: Entity = env.scene[asset_cfg.name]
 
@@ -48,8 +49,9 @@ def terrain_levels_vel(
     asset.data.root_link_pos_w[env_ids, :2] - env.scene.env_origins[env_ids, :2], dim=1
   )
 
+  threshold = move_up_distance if move_up_distance is not None else terrain_generator.size[0] / 2
   # Robots that walked far enough progress to harder terrains.
-  move_up = distance > terrain_generator.size[0] / 2
+  move_up = distance > threshold
 
   # Robots that walked less than half of their required distance go to simpler
   # terrains.

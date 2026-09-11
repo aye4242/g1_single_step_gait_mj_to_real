@@ -13,7 +13,7 @@ lowcmd_topic: "rt/lowcmd"
 lowstate_topic: "rt/lowstate"
 
 # 策略文件路径 (ONNX)
-policy_path: "policy/policy_best.onnx"
+policy_path: "policy/policy_up.onnx"
 
 # 观测历史长度
 history_length: 5  # 5 帧历史
@@ -50,7 +50,7 @@ command_range:
   ang_vel_z: [-0.2, 0.2]   # 很小的转向
 
 # 步态相位周期
-gait_phase_period: 0.8  # 0.8 秒一个周期
+gait_phase_period: 0.6  # 与训练 velocity_env_cfg.py:74 period=0.6 保持一致
 
 # 安全限制
 max_joint_vel: 20.0      # rad/s
