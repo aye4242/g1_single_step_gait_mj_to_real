@@ -45,9 +45,9 @@ num_obs: 98  # [ang_vel(3), gravity(3), command(3), phase(2), joint_pos(29), joi
 
 # 速度指令范围 (遥控器缩放后)
 command_range:
-  lin_vel_x: [0.2, 1.0]    # 单台阶任务：只前进
-  lin_vel_y: [-0.1, 0.1]   # 很小的横向速度
-  ang_vel_z: [-0.2, 0.2]   # 很小的转向
+  lin_vel_x: [0.35, 0.85]    # 0.2~1.0 → 0.35~0.85，避免过慢导致多次试探
+  lin_vel_y: [-0.1, 0.1]     # 很小的横向速度
+  ang_vel_z: [-0.2, 0.2]     # 很小的转向
 
 # 步态相位周期
 gait_phase_period: 0.6  # 与训练 velocity_env_cfg.py:74 period=0.6 保持一致
